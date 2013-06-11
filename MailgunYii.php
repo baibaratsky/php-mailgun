@@ -16,7 +16,7 @@ class MailgunYii extends CApplicationComponent
     public $clicksTrackingMode;
     public $enableOpensTracking;
 
-    private $_api;
+    protected $_api;
 
     public function __call($name, $parameters)
     {
