@@ -1,7 +1,7 @@
 Mailgun API PHP library
 =======================
 
-Only sending messages using API is supported at the moment and it works pretty simple:
+Only sending messages using API is supported at the moment. It works pretty easy:
 ```php
 $mailgun = new MailgunApi('example.com', 'key-somekey');
 
@@ -18,7 +18,7 @@ echo $mailgun->sendMessage($message);
 ```
 
 ###Yii extension
-Yii users can use this library as an extension. Just put *php-mailgun* in your extensions directory and add some code in *components* section of your config file:
+Yii users can use this library as an extension. Just put *php-mailgun* in your extensions directory and add some code in the *components* section of your config file:
 ```php
 ...
     'components' => array(
@@ -47,5 +47,5 @@ $message->renderText('myView', array('myParam' => 'Awsome!'));
 echo Yii::app()->mailgun->sendMessage($message);
 ```
 ---
-Mailgun is a programmable email platform. It allows your application to become a fully featured email server. Send and receive messages, create mailboxes and email campaigns with ease.
+Mailgun is a programmable email platform. It allows your application to become a fully-featured email server. Send and receive messages, create mailboxes and email campaigns with ease.
 You can find more information about Mailgun and its API here: http://documentation.mailgun.com
