@@ -8,6 +8,10 @@ class MailgunYii extends CApplicationComponent
     public $domain;
     public $key;
 
+    public $viewPath = 'application.views.mail';
+
+    public $fromAddress;
+    public $fromName;
     public $tags = array();
     public $campaignId;
     public $enableDkim;
@@ -30,6 +34,9 @@ class MailgunYii extends CApplicationComponent
     {
         $this->_api = new MailgunApi($this->domain, $this->key);
 
+        if (!empty($this->fromAddress)) {
+            $this->_api->setFrom($this->fromAddress, $this->fromName);
+        }
         foreach ($this->tags as $tag) {
             $this->_api->addTag($tag);
         }
@@ -51,5 +58,74 @@ class MailgunYii extends CApplicationComponent
         if (isset($this->enableOpensTracking)) {
             $this->enableOpensTracking ? $this->_api->enableOpensTracking() : $this->_api->disableOpensTracking();
         }
+    }
+
+    /**
+     * @return MailgunMessageYii
+     */
+    public function createMessage()
+    {
+        $message = new MailgunMessageYii($this->_api);
+        $message->setViewPath($this->viewPath);
+        return $message;
+    }
+}
+
+
+class MailgunMessageYii extends MailgunMessage
+{
+    private $_viewPath;
+
+    /**
+     * @param string $viewPath
+     */
+    public function setViewPath($viewPath)
+    {
+        $this->_viewPath = $viewPath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewPath()
+    {
+        return $this->_viewPath;
+    }
+
+    /**
+     * Set the message text from view
+     * @param $view
+     * @param array $params
+     */
+    public function renderText($view, $params = array())
+    {
+        $this->setText($this->_render($view, $params));
+    }
+
+    /**
+     * Set the message HTML from view
+     * @param $view
+     * @param array $params
+     */
+    public function renderHtml($view, $params = array())
+    {
+        $this->setHtml($this->_render($view, $params));
+    }
+
+    /**
+     * Render message view
+     * @param $view
+     * @param array $params
+     * @return string
+     */
+    protected function _render($view, $params = array())
+    {
+        if (isset(Yii::app()->controller)) {
+            $controller = Yii::app()->controller;
+        } else {
+            $controller = new CController(get_class());
+        }
+        $viewPath = Yii::app()->findLocalizedFile(Yii::getPathOfAlias($this->_viewPath . '.' . $view) . '.php');
+        return $controller->renderInternal($viewPath, $params, true);
     }
 }

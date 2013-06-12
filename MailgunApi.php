@@ -9,6 +9,7 @@ class MailgunApi
     protected $_url = 'https://api.mailgun.net/v2/';
     protected $_timeout = 10;
 
+    private $_from;
     private $_tags;
     private $_campaignId;
     private $_enableDkim;
@@ -79,6 +80,24 @@ class MailgunApi
                                            $responseStatus);
             }
         }
+    }
+
+    /**
+     * @param string $address   Email address for From header
+     * @param string $name      Sender name
+     */
+    public function setFrom($address, $name = null)
+    {
+        $this->_from = array($address, $name);
+    }
+
+
+    /**
+     * @return array Email address for From header
+     */
+    public function getFrom()
+    {
+        return $this->_from;
     }
 
     /**

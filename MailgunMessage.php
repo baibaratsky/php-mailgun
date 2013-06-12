@@ -29,11 +29,12 @@ class MailgunMessage
     /** @var DateTime */
     private $_deliveryTime;
 
-    private $_api;
+    protected $_api;
 
     public function __construct(MailgunApi $api)
     {
         $this->_api = $api;
+        $this->_from = $api->getFrom();
         $this->_tags = $api->getTags();
         $this->_campaignId = $api->getCampaignId();
         $this->_enableDkim = $api->getIsDkimEnabled();

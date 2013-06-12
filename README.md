@@ -40,7 +40,9 @@ $message = Yii::app()->mailgun->createMessage();
 $message->setFrom('me@example.com', 'Andrei Baibaratsky');
 $message->addTo('you@yourdomain.com', 'My dear user');
 $message->setSubject('Mailgun API library test');
-$message->setText('It’s working. Again. With Yii.');
+
+// You can use views to build your messages instead of setText() or setHtml():
+$message->renderText('myView', array('myParam' => 'Awsome!'));
 
 echo Yii::app()->mailgun->sendMessage($message);
 ```
