@@ -10,7 +10,7 @@ class MailgunApi
     protected $_timeout = 10;
 
     private $_from;
-    private $_tags;
+    private $_tags = array();
     private $_campaignId;
     private $_enableDkim;
     private $_enableTestMode;

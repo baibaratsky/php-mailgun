@@ -25,6 +25,7 @@ class MailgunMessage
     private $_enableOpensTracking;
     private $_headers = array();
     private $_vars = array();
+    private $_recipientVars = array();
 
     /** @var DateTime */
     private $_deliveryTime;
@@ -63,12 +64,24 @@ class MailgunMessage
     }
 
     /**
-     * @param string $address   Email address of the recipient
-     * @param string $name      Recipient name
+     * @param string $address       Email address of the recipient
+     * @param string $name          Recipient name
+     * @param array  $recipientVars Custom variables that you define, which you can then reference in the message body
+     * @throws MailgunException
+     *
+     * Recipient vars give you the ability to send a custom message to each recipient while still using a single API call
+     * @link http://documentation.mailgun.com/user_manual.html#sending-via-api
      */
-    public function addTo($address, $name = null)
+    public function addTo($address, $name = null, $recipientVars = null)
     {
+        if (count($this->_to) >= 1000) {
+            throw new MailgunException('The maximum number of recipients allowed for Batch Sending is 1,000.');
+        }
+
         $this->_to[] = array($address, $name);
+        if (is_array($recipientVars)) {
+            $this->_recipientVars[$address] = $recipientVars;
+        }
     }
 
     /**
@@ -493,8 +506,8 @@ class MailgunMessage
             $data['h:' . $name] = $value;
         }
 
-        foreach ($this->_vars as $name => $value) {
-            $data['v:' . $name] = $value;
+        if (!empty($this->_recipientVars)) {
+            $data['recipient-variables'] = json_encode($this->_recipientVars);
         }
 
         return $data;
