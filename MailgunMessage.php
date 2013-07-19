@@ -70,7 +70,7 @@ class MailgunMessage
      * @throws MailgunException
      *
      * Recipient vars give you the ability to send a custom message to each recipient while still using a single API call
-     * @link http://documentation.mailgun.com/user_manual.html#sending-via-api
+     * @link http://documentation.mailgun.com/user_manual.html#batch-sending
      */
     public function addTo($address, $name = null, $recipientVars = null)
     {
