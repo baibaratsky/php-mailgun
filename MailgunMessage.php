@@ -506,6 +506,10 @@ class MailgunMessage
             $data['h:' . $name] = $value;
         }
 
+        foreach ($this->_vars as $name => $value) {
+            $data['v:' . $name] = $value;
+        }
+
         if (!empty($this->_recipientVars)) {
             $data['recipient-variables'] = json_encode($this->_recipientVars);
         }
