@@ -1,6 +1,8 @@
 Mailgun API PHP library
 =======================
 
+The library requires PHP 5 compiled with [cURL extension](http://www.php.net/manual/en/book.curl.php).
+
 Only sending messages using API is supported at the moment. It works pretty easy:
 ```php
 $mailgun = new MailgunApi('example.com', 'key-somekey');
