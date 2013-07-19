@@ -42,7 +42,7 @@ class MailgunApi
      * Create new message
      * @return MailgunMessage
      */
-    public function createMessage()
+    public function newMessage()
     {
         return new MailgunMessage($this);
     }
@@ -55,8 +55,6 @@ class MailgunApi
     public function sendMessage(MailgunMessage $message)
     {
         $curl = $this->_getCurl();
-        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl, CURLOPT_USERPWD, 'api:' . $this->_key);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_URL, $this->_url . $this->_domain . '/messages');
         curl_setopt($curl, CURLOPT_POSTFIELDS, $message->getPostData());
@@ -241,8 +239,10 @@ class MailgunApi
     {
         if (!$this->_curl) {
             $this->_curl = curl_init();
-            curl_setopt($this->_curl, CURLOPT_TIMEOUT, $this->_timeout);
+            curl_setopt($this->_curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_setopt($this->_curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($this->_curl, CURLOPT_TIMEOUT, $this->_timeout);
+            curl_setopt($this->_curl, CURLOPT_USERPWD, 'api:' . $this->_key);
         }
         return $this->_curl;
     }

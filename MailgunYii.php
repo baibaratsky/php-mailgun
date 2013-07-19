@@ -3,6 +3,11 @@
 
 require_once 'MailgunApi.php';
 
+/**
+ * Class MailgunYii
+ *
+ * @method string sendMessage(MailgunMessageYii $message)
+ */
 class MailgunYii extends CApplicationComponent
 {
     public $domain;
@@ -63,7 +68,7 @@ class MailgunYii extends CApplicationComponent
     /**
      * @return MailgunMessageYii
      */
-    public function createMessage()
+    public function newMessage()
     {
         $message = new MailgunMessageYii($this->_api);
         $message->setViewPath($this->viewPath);

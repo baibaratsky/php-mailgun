@@ -7,7 +7,7 @@ Only sending messages using API is supported at the moment. It works pretty easy
 ```php
 $mailgun = new MailgunApi('example.com', 'key-somekey');
 
-$message = $mailgun->createMessage();
+$message = $mailgun->newMessage();
 $message->setFrom('me@example.com', 'Andrei Baibaratsky');
 $message->addTo('you@yourdomain.com', 'My dear user');
 $message->setSubject('Mailgun API library test');
@@ -38,7 +38,7 @@ Yii users can use this library as an extension. Just put *php-mailgun* in your e
 ```
 That’s all! Your application is ready to send messages. For example:
 ```php
-$message = Yii::app()->mailgun->createMessage();
+$message = Yii::app()->mailgun->newMessage();
 $message->setFrom('me@example.com', 'Andrei Baibaratsky');
 $message->addTo('you@yourdomain.com', 'My dear user');
 $message->setSubject('Mailgun API library test');

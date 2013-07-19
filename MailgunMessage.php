@@ -30,19 +30,18 @@ class MailgunMessage
     /** @var DateTime */
     private $_deliveryTime;
 
-    protected $_api;
-
-    public function __construct(MailgunApi $api)
+    public function __construct(MailgunApi $api = null)
     {
-        $this->_api = $api;
-        $this->_from = $api->getFrom();
-        $this->_tags = $api->getTags();
-        $this->_campaignId = $api->getCampaignId();
-        $this->_enableDkim = $api->getIsDkimEnabled();
-        $this->_enableTestMode = $api->getIsTestModeEnabled();
-        $this->_enableTracking = $api->getIsTrackingEnabled();
-        $this->_clicksTrackingMode = $api->getClicksTrackingMode();
-        $this->_enableOpensTracking = $api->getIsOpensTrackingEnabled();
+        if ($api !== null) {
+            $this->_from = $api->getFrom();
+            $this->_tags = $api->getTags();
+            $this->_campaignId = $api->getCampaignId();
+            $this->_enableDkim = $api->getIsDkimEnabled();
+            $this->_enableTestMode = $api->getIsTestModeEnabled();
+            $this->_enableTracking = $api->getIsTrackingEnabled();
+            $this->_clicksTrackingMode = $api->getClicksTrackingMode();
+            $this->_enableOpensTracking = $api->getIsOpensTrackingEnabled();
+        }
     }
 
     /**
@@ -53,7 +52,6 @@ class MailgunMessage
     {
         $this->_from = array($address, $name);
     }
-
 
     /**
      * @return array Email address for From header
