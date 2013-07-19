@@ -2,6 +2,8 @@
 /** @author Andrei Baibaratsky */
 
 require_once 'MailgunMessage.php';
+require_once 'MailgunList.php';
+require_once 'MailgunListMember.php';
 
 class MailgunApi
 {
@@ -39,7 +41,6 @@ class MailgunApi
     }
 
     /**
-     * Create new message
      * @return MailgunMessage
      */
     public function newMessage()
@@ -50,48 +51,188 @@ class MailgunApi
     /**
      * @param MailgunMessage $message
      * @return string Mailgun ID of the message
-     * @throws MailgunException
      */
     public function sendMessage(MailgunMessage $message)
     {
-        $curl = $this->_getCurl();
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_URL, $this->_url . $this->_domain . '/messages');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $message->getPostData());
-
-        $response = curl_exec($curl);
-
-        if ($response === false) {
-            throw new MailgunException(curl_error($curl));
-        }
-
-        $responseStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        if ($responseStatus >= 500) {
-            throw new MailgunException('Mailgun server error', $responseStatus);
-        } else {
-            $responseArray = $this->_jsonDecode($response);
-            if ($responseStatus == 200) {
-                return $responseArray['id'];
-            } else {
-                throw new MailgunException(!empty($responseArray['message']) ? $responseArray['message'] : $response,
-                                           $responseStatus);
-            }
-        }
+        $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/messages', $message);
+        return $response['id'];
     }
 
     /**
-     * @param string $address   Email address for From header
-     * @param string $name      Sender name
+     * @param int $limit    Maximum number of records to return (100 by default)
+     * @param int $skip     Records to skip (0 by default)
+     * @return MailgunList[]
+     */
+    public function getMailingLists($limit = 100, $skip = 0)
+    {
+        $response = $this->_performRequest('GET', $this->_url . 'lists?limit=' . $limit . '&skip=' . $skip);
+        $mailingLists = array();
+        foreach ($response['items'] as $item) {
+            $mailingLists[$item['address']] = MailgunList::load($item);
+        }
+        return $mailingLists;
+    }
+
+    /**
+     * @param string $listAddress   Address of the mailing list to find
+     * @return MailgunList
+     */
+    public function getMailingList($listAddress)
+    {
+        $response = $this->_performRequest('GET', $this->_url . 'lists/' . $listAddress);
+        return MailgunList::load($response['list']);
+    }
+
+    /**
+     * @param MailgunList $mailingList  Mailing list object to create
+     * @return MailgunList              Created mailing list object
+     */
+    public function createMailingList(MailgunList $mailingList)
+    {
+        $response = $this->_performRequest('POST', $this->_url . 'lists', $mailingList);
+        return MailgunList::load($response['list']);
+    }
+
+    /**
+     * @param string $listAddress       Address of the mailing list to update
+     * @param MailgunList $mailingList  Mailing list object containing new data
+     * @return MailgunList              Updated mailing list object
+     */
+    public function updateMailingList($listAddress, MailgunList $mailingList)
+    {
+        $response = $this->_performRequest('PUT', $this->_url . 'lists/' . $listAddress, $mailingList);
+        return MailgunList::load($response['list']);
+    }
+
+    /**
+     * @param string $listAddress   Address of the mailing list to delete
+     * @return bool                 Whether the list is successfully deleted
+     */
+    public function deleteMailingList($listAddress)
+    {
+        $response = $this->_performRequest('DELETE', $this->_url . 'lists/' . $listAddress);
+        return $response['message'] == 'Mailing list has been deleted';
+    }
+
+    /**
+     * @param string $listAddress   Address of the mailing list
+     * @param int $limit            Maximum number of records to return (100 by default)
+     * @param int $skip             Records to skip (0 by default)
+     * @return MailgunListMember[]
+     */
+    public function getMailingListMembers($listAddress, $limit = 100, $skip = 0)
+    {
+        $response = $this->_performRequest('GET', $this->_url . 'lists/' . $listAddress
+                                                              . '/members?limit=' . $limit . '&skip=' . $skip);
+        $members = array();
+        foreach ($response['items'] as $item) {
+            $members[$item['address']] = MailgunListMember::load($item);
+        }
+        return $members;
+    }
+
+    /**
+     * @param string $listAddress   Address of the mailing list
+     * @param string $memberAddress Address of the mailing list member to find
+     * @return MailgunListMember
+     */
+    public function getMailingListMember($listAddress, $memberAddress)
+    {
+        $response = $this->_performRequest('GET', $this->_url . 'lists/' . $listAddress . '/members/' . $memberAddress);
+        return MailgunListMember::load($response['member']);
+    }
+
+    /**
+     * @param string $listAddress           Address of the mailing list
+     * @param MailgunListMember $member     Member to add to the mailing list
+     * @param bool $upsert                  Whether to update member if present (defaults to false)
+     * @return MailgunListMember
+     */
+    public function addMemberToMailingList($listAddress, MailgunListMember $member, $upsert = false)
+    {
+        $response = $this->_performRequest('POST', $this->_url . 'lists/' . $listAddress . '/members', $member,
+                                           array('upsert' => $upsert ? 'yes' : 'no'));
+        return MailgunListMember::load($response['member']);
+    }
+
+    /**
+     * Add multiple mailing list members (limit 1,000 per call)
+     *
+     * @param string $listAddress                   Address of the mailing list
+     * @param array[]|MailgunListMember[] $members  Members to add to the mailing list
+     * @return MailgunList                          Updated mailing list
+     * @throws MailgunException
+     */
+    public function addMultipleMembersToMailingList($listAddress, $members)
+    {
+        if (count($members) == 0) {
+            throw new MailgunException('The members list is empty.');
+        }
+
+        if (count($members) > 1000) {
+            throw new MailgunException('The maximum number of members allowed in one request is 1,000.');
+        }
+
+        if (is_array($members[0])) {
+            $data['members'] = $members;
+        } else {
+            $data['members'] = array();
+            foreach ($members as $member) {
+                $data['members'][] = $member->getPostData();
+            }
+        }
+        $data['members'] = json_encode($data['members']);
+
+        $response = $this->_performRequest('POST', $this->_url . 'lists/' . $listAddress . '/members.json', null, $data);
+
+        return MailgunList::load($response['list']);
+    }
+
+    /**
+     * @param string $listAddress       Address of the mailing list
+     * @param string $memberAddress     Address of the mailing list member to update
+     * @param MailgunListMember $member Mailing list member object containing new data
+     * @return MailgunListMember        Updated list member object
+     */
+    public function updateMailingListMember($listAddress, $memberAddress, MailgunListMember $member)
+    {
+        $response = $this->_performRequest('PUT', $this->_url . 'lists/' . $listAddress . '/members/' . $memberAddress,
+                                           $member);
+        return MailgunListMember::load($response['member']);
+    }
+
+    /**
+     * @param string $listAddress   Address of the mailing list
+     * @param string $memberAddress Address of the mailing list member to delete
+     * @return bool                 Whether the member is successfully deleted
+     */
+    public function deleteMailingListMember($listAddress, $memberAddress)
+    {
+        $response = $this->_performRequest('DELETE', $this->_url . 'lists/' . $listAddress
+                                                                 . '/members/' . $memberAddress);
+        return $response['message'] == 'Mailing list member has been deleted';
+    }
+
+    /**
+     * @param string $listAddress
+     * @return array
+     */
+    public function getMailingListStats($listAddress)
+    {
+        return $this->_performRequest('GET', $this->_url . 'lists/' . $listAddress . '/stats');
+    }
+
+    /**
+     * @param string $address   Default email address for From header of new messages
+     * @param string $name      Default sender name
      */
     public function setFrom($address, $name = null)
     {
         $this->_from = array($address, $name);
     }
 
-
     /**
-     * @return array Email address for From header
+     * @return array Default email address for From header of new messages
      */
     public function getFrom()
     {
@@ -233,7 +374,7 @@ class MailgunApi
     }
 
     /**
-     * @return resource CURL instance
+     * @return resource cURL instance
      */
     protected function _getCurl()
     {
@@ -248,15 +389,59 @@ class MailgunApi
     }
 
     /**
-     * @param string $json
+     * @param string $method
+     * @param string $url
+     * @param MailgunObject $object
+     * @param array $params
      * @return array
+     * @throws MailgunException
      */
-    protected function _jsonDecode($json)
+    protected function _performRequest($method, $url, MailgunObject $object = null, $params = array())
     {
-        return json_decode($json, true);
+        $curl = $this->_getCurl();
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($curl, CURLOPT_URL, $url);
+
+        if ($object !== null) {
+            $params = array_merge($object->getPostData(), $params);
+        }
+
+        if (!empty($params)) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+        }
+
+        $response = curl_exec($curl);
+
+        if ($response === false) {
+            throw new MailgunException(curl_error($curl));
+        }
+
+        $responseStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        if ($responseStatus >= 500) {
+            throw new MailgunException('Mailgun server error', $responseStatus);
+        } else {
+            $responseArray = json_decode($response, true);
+            if ($responseStatus == 200) {
+                return $responseArray;
+            } else {
+                throw new MailgunException(!empty($responseArray['message']) ? $responseArray['message'] : $response,
+                                           $responseStatus);
+            }
+        }
     }
 }
 
+
 class MailgunException extends Exception
 {
+}
+
+
+interface MailgunObject
+{
+    /**
+     * @return array POST-data for Mailgun API request
+     */
+    public function getPostData();
 }
