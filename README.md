@@ -3,7 +3,7 @@ Mailgun API PHP library
 
 The library requires PHP 5.2 compiled with [cURL extension](http://www.php.net/manual/en/book.curl.php).
 
-It is pretty easy to send a message using this library:
+It’s pretty easy to send a message using this library:
 ```php
 $mailgun = new MailgunApi('example.com', 'key-somekey');
 
@@ -66,7 +66,7 @@ $message->renderText('myView', array('myParam' => 'Awesome!'));
 
 echo Yii::app()->mailgun->sendMessage($message);
 ```
-All the methods of the main library class are available in Yii component.
+All the methods of the main library class are available in the Yii component.
 
 
 ---
