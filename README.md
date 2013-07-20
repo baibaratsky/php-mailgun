@@ -37,6 +37,15 @@ bool                 deleteMailingListMember(string $listAddress, string $member
 array                getMailingListStats(string $listAddress)
 ```
 
+Unsubscribes-related methods:
+```
+MailgunUnsubscribe[] getUnsubscribes(int $limit = 100, int $skip = 0)
+MailgunUnsubscribe[] getUserUnsubscribes(string $userAddress)
+bool                 createUnsubscribe(MailgunUnsubscribe $unsubscribe)
+bool                 deleteUnsubscribe(string $id)
+bool                 deleteUserUnsubscribes(string $userAddress)
+```
+
 ###Yii extension
 Yii users can use this library as an extension. Just put *php-mailgun* in your extensions directory and add some code in the *components* section of your config file:
 ```php
