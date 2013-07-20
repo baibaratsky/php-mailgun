@@ -3,6 +3,7 @@
 
 require_once 'MailgunMessage.php';
 require_once 'MailgunUnsubscribe.php';
+require_once 'MailgunComplaint.php';
 require_once 'MailgunList.php';
 require_once 'MailgunListMember.php';
 
@@ -282,6 +283,52 @@ class MailgunApi
     {
         $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/unsubscribes/' . $userAddress);
         return $response['message'] == 'Unsubscribe event has been removed';
+    }
+
+    /**
+     * @param int $limit            Maximum number of records to return (100 by default)
+     * @param int $skip             Records to skip (0 by default)
+     * @return MailgunComplaint[]
+     */
+    public function getComplaints($limit = 100, $skip = 0)
+    {
+        $response = $this->_performRequest('GET', $this->_url . $this->_domain
+                                                              . '/complaints?limit=' . $limit . '&skip=' . $skip);
+        $unsubscribes = array();
+        foreach ($response['items'] as $item) {
+            $unsubscribes[$item['address']] = MailgunComplaint::load($item);
+        }
+        return $unsubscribes;
+    }
+
+    /**
+     * @param string $userAddress   Address of the user to find
+     * @return MailgunComplaint[]
+     */
+    public function getComplaint($userAddress)
+    {
+        $response = $this->_performRequest('GET', $this->_url . $this->_domain . '/complaints/' . $userAddress);
+        return MailgunComplaint::load($response['complaint']);
+    }
+
+    /**
+     * @param MailgunComplaint $complaint   Complaint object to create
+     * @return bool                         Whether the complaint record has been successfully added
+     */
+    public function createComplaint(MailgunComplaint $complaint)
+    {
+        $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/complaints', $complaint);
+        return $response['message'] == 'Address has been added to the complaints table';
+    }
+
+    /**
+     * @param string $userAddress   User’s address to delete complaint record
+     * @return bool                 Whether the complaint record has been successfully deleted
+     */
+    public function deleteComplaint($userAddress)
+    {
+        $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/complaints/' . $userAddress);
+        return $response['message'] == 'Spam complaint has been removed';
     }
 
     /**
