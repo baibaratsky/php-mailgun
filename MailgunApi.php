@@ -2,6 +2,7 @@
 /** @author Andrei Baibaratsky */
 
 require_once 'MailgunMessage.php';
+require_once 'MailgunUnsubscribe.php';
 require_once 'MailgunList.php';
 require_once 'MailgunListMember.php';
 
@@ -106,7 +107,7 @@ class MailgunApi
 
     /**
      * @param string $listAddress   Address of the mailing list to delete
-     * @return bool                 Whether the list is successfully deleted
+     * @return bool                 Whether the list has been successfully deleted
      */
     public function deleteMailingList($listAddress)
     {
@@ -204,7 +205,7 @@ class MailgunApi
     /**
      * @param string $listAddress   Address of the mailing list
      * @param string $memberAddress Address of the mailing list member to delete
-     * @return bool                 Whether the member is successfully deleted
+     * @return bool                 Whether the member has been successfully deleted
      */
     public function deleteMailingListMember($listAddress, $memberAddress)
     {
@@ -220,6 +221,67 @@ class MailgunApi
     public function getMailingListStats($listAddress)
     {
         return $this->_performRequest('GET', $this->_url . 'lists/' . $listAddress . '/stats');
+    }
+
+    /**
+     * @param int $limit            Maximum number of records to return (100 by default)
+     * @param int $skip             Records to skip (0 by default)
+     * @return MailgunUnsubscribe[]
+     */
+    public function getUnsubscribes($limit = 100, $skip = 0)
+    {
+        $response = $this->_performRequest('GET', $this->_url . $this->_domain
+                                                              . '/unsubscribes?limit=' . $limit . '&skip=' . $skip);
+        $unsubscribes = array();
+        foreach ($response['items'] as $item) {
+            $unsubscribes[$item['id']] = MailgunUnsubscribe::load($item);
+        }
+        return $unsubscribes;
+    }
+
+    /**
+     * @param string $userAddress   Address of the user to find
+     * @return MailgunUnsubscribe[]
+     */
+    public function getUserUnsubscribes($userAddress)
+    {
+        $response = $this->_performRequest('GET', $this->_url . $this->_domain . '/unsubscribes/' . $userAddress);
+
+        $unsubscribes = array();
+        foreach ($response['items'] as $item) {
+            $unsubscribes[$item['id']] = MailgunUnsubscribe::load($item);
+        }
+        return $unsubscribes;
+    }
+
+    /**
+     * @param MailgunUnsubscribe $unsubscribe   Unsubscribe object to create
+     * @return bool                             Whether the unsubscribe record has been successfully added
+     */
+    public function createUnsubscribe(MailgunUnsubscribe $unsubscribe)
+    {
+        $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/unsubscribes', $unsubscribe);
+        return $response['message'] == 'Address has been added to the unsubscribes table';
+    }
+
+    /**
+     * @param string $id    Id of the unsubscribe record to delete
+     * @return bool         Whether the record has been successfully deleted
+     */
+    public function deleteUnsubscribe($id)
+    {
+        $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/unsubscribes/' . $id);
+        return $response['message'] == 'Unsubscribe event has been removed';
+    }
+
+    /**
+     * @param string $userAddress   User’s address to delete unsubscribe records
+     * @return bool                 Whether the records have been successfully deleted
+     */
+    public function deleteUserUnsubscribes($userAddress)
+    {
+        $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/unsubscribes/' . $userAddress);
+        return $response['message'] == 'Unsubscribe event has been removed';
     }
 
     /**

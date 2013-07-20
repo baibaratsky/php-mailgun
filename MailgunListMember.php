@@ -8,6 +8,10 @@ class MailgunListMember implements MailgunObject
     private $_vars = array();
     private $_isSubscribed;
 
+    /**
+     * @param array $data
+     * @return MailgunListMember
+     */
     public static function load($data)
     {
         $member = new self($data['address'], $data['name']);
