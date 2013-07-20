@@ -1,9 +1,9 @@
 Mailgun API PHP library
 =======================
 
-The library requires PHP 5 compiled with [cURL extension](http://www.php.net/manual/en/book.curl.php).
+The library requires PHP 5.2 compiled with [cURL extension](http://www.php.net/manual/en/book.curl.php).
 
-Only sending messages using API is supported at the moment. It works pretty easy:
+It’s pretty easy to send a message using this library:
 ```php
 $mailgun = new MailgunApi('example.com', 'key-somekey');
 
@@ -17,6 +17,24 @@ $message->addTag('test'); // All the Mailgun-specific attributes, such as tags, 
 $message->enableTestMode(); // Don’t forget to remove this string if you really want the message to be sent
 
 echo $mailgun->sendMessage($message);
+```
+
+Batch sending is also supported. You can use [recipient variables](http://documentation.mailgun.com/user_manual.html#batch-sending) to customize messages.
+
+The library fully supports listing, creating, updating, and deleting of mailing lists and their members:
+```
+MailgunList[]        getMailingLists(int $limit = 100, int $skip = 0)
+MailgunList          getMailingList(string $listAddress)
+MailgunList          createMailingList(MailgunList $mailingList)
+MailgunList          updateMailingList(string $listAddress, MailgunList $mailingList)
+bool                 deleteMailingList(string $listAddress)
+MailgunListMember[]  getMailingListMembers(string $listAddress, int $limit = 100, int $skip = 0)
+MailgunListMember    getMailingListMember(string $listAddress, string $memberAddress)
+MailgunListMember    addMemberToMailingList(string $listAddress, MailgunListMember $member, bool $upsert = false)
+MailgunList          addMultipleMembersToMailingList(string $listAddress, array $members)
+MailgunListMember    updateMailingListMember(string $listAddress, string $memberAddress, MailgunListMember $member)
+bool                 deleteMailingListMember(string $listAddress, string $memberAddress)
+array                getMailingListStats(string $listAddress)
 ```
 
 ###Yii extension
@@ -48,6 +66,9 @@ $message->renderText('myView', array('myParam' => 'Awesome!'));
 
 echo Yii::app()->mailgun->sendMessage($message);
 ```
+All the methods of the main library class are available in the Yii component.
+
+
 ---
 Mailgun is a programmable email platform. It allows your application to become a fully-featured email server. Send and receive messages, create mailboxes and email campaigns with ease.
 You can find more information about Mailgun and its API here: http://documentation.mailgun.com

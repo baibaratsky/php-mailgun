@@ -1,7 +1,7 @@
 <?php
 /** @author Andrei Baibaratsky */
 
-class MailgunMessage
+class MailgunMessage implements MailgunObject
 {
     const CLICKS_TRACKING_DISABLED = 0;
     const CLICKS_TRACKING_ENABLED = 1;
