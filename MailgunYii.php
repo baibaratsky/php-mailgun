@@ -31,7 +31,7 @@ require_once 'MailgunApi.php';
  * @method MailgunBounce[]      getBounces(int $limit = 100, int $skip = 0)
  * @method MailgunBounce        getBounce(string $userAddress)
  * @method bool                 createBounce(MailgunBounce $bounce)
- * @method bool                 deleteBounce($userAddress)
+ * @method bool                 deleteBounce(string $userAddress)
  * @method void                 setFrom(string $address, string $name = null)
  * @method string               getFrom()
  * @method void                 addTag(string $tag)

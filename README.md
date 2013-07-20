@@ -59,7 +59,7 @@ Bounces:
 MailgunBounce[]      getBounces(int $limit = 100, int $skip = 0)
 MailgunBounce        getBounce(string $userAddress)
 bool                 createBounce(MailgunBounce $bounce)
-bool                 deleteBounce($userAddress)
+bool                 deleteBounce(string $userAddress)
 ```
 
 ###Yii extension
