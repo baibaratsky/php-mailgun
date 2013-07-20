@@ -12,10 +12,10 @@ class MailgunComplaint implements MailgunObject
      */
     public static function load($data)
     {
-        $unsubscribe = new self($data['address']);
-        $unsubscribe->_count = $data['count'];
-        $unsubscribe->_createDt = new DateTime($data['created_at']);
-        return $unsubscribe;
+        $complaint = new self($data['address']);
+        $complaint->_count = $data['count'];
+        $complaint->_createDt = new DateTime($data['created_at']);
+        return $complaint;
     }
 
     /**
@@ -45,7 +45,7 @@ class MailgunComplaint implements MailgunObject
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getCount()
     {

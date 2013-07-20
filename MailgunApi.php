@@ -4,6 +4,7 @@
 require_once 'MailgunMessage.php';
 require_once 'MailgunUnsubscribe.php';
 require_once 'MailgunComplaint.php';
+require_once 'MailgunBounce.php';
 require_once 'MailgunList.php';
 require_once 'MailgunListMember.php';
 
@@ -329,6 +330,52 @@ class MailgunApi
     {
         $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/complaints/' . $userAddress);
         return $response['message'] == 'Spam complaint has been removed';
+    }
+
+    /**
+     * @param int $limit            Maximum number of records to return (100 by default)
+     * @param int $skip             Records to skip (0 by default)
+     * @return MailgunBounce[]
+     */
+    public function getBounces($limit = 100, $skip = 0)
+    {
+        $response = $this->_performRequest('GET', $this->_url . $this->_domain
+                                                              . '/bounces?limit=' . $limit . '&skip=' . $skip);
+        $unsubscribes = array();
+        foreach ($response['items'] as $item) {
+            $unsubscribes[$item['address']] = MailgunBounce::load($item);
+        }
+        return $unsubscribes;
+    }
+
+    /**
+     * @param string $userAddress   Address of the user to find
+     * @return MailgunBounce[]
+     */
+    public function getBounce($userAddress)
+    {
+        $response = $this->_performRequest('GET', $this->_url . $this->_domain . '/bounces/' . $userAddress);
+        return MailgunBounce::load($response['bounce']);
+    }
+
+    /**
+     * @param MailgunBounce $bounce     Bounce object to create
+     * @return bool                     Whether the bounce record has been successfully added
+     */
+    public function createBounce(MailgunBounce $bounce)
+    {
+        $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/bounces', $bounce);
+        return $response['message'] == 'Address has been added to the bounces table';
+    }
+
+    /**
+     * @param string $userAddress   User’s address to delete bounce record
+     * @return bool                 Whether the bounce record has been successfully deleted
+     */
+    public function deleteBounce($userAddress)
+    {
+        $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/bounces/' . $userAddress);
+        return $response['message'] == 'Bounced address has been removed';
     }
 
     /**

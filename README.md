@@ -54,6 +54,14 @@ bool                 createComplaint(MailgunComplaint $complaint)
 bool                 deleteComplaint(string $userAddress)
 ```
 
+Bounces:
+```
+MailgunBounce[]      getBounces(int $limit = 100, int $skip = 0)
+MailgunBounce        getBounce(string $userAddress)
+bool                 createBounce(MailgunBounce $bounce)
+bool                 deleteBounce($userAddress)
+```
+
 ###Yii extension
 Yii users can use this library as an extension. Just put *php-mailgun* in your extensions directory and add some code in the *components* section of your config file:
 ```php
