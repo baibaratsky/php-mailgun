@@ -379,6 +379,15 @@ class MailgunApi
     }
 
     /**
+     * @param array $data   POST data of the request
+     * @return bool
+     */
+    public function validateHook($data)
+    {
+        return hash_hmac('sha256', $data['timestamp'] . $data['token'], $this->_key) === $data['signature'];
+    }
+
+    /**
      * @param string $address   Default email address for From header of new messages
      * @param string $name      Default sender name
      */

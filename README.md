@@ -62,6 +62,13 @@ bool                 createBounce(MailgunBounce $bounce)
 bool                 deleteBounce(string $userAddress)
 ```
 
+Webhook signature validation:
+```php
+if (!$mailgun->validateHook($_POST)) {
+    echo 'Bad signature!';
+}
+```
+
 ###Yii extension
 Yii users can use this library as an extension. Just put *php-mailgun* in your extensions directory and add some code in the *components* section of your config file:
 ```php

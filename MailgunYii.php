@@ -32,6 +32,7 @@ require_once 'MailgunApi.php';
  * @method MailgunBounce        getBounce(string $userAddress)
  * @method bool                 createBounce(MailgunBounce $bounce)
  * @method bool                 deleteBounce(string $userAddress)
+ * @method bool                 validateHook(array $data)
  * @method void                 setFrom(string $address, string $name = null)
  * @method string               getFrom()
  * @method void                 addTag(string $tag)
