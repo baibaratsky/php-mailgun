@@ -16,7 +16,7 @@ $message->addTag('test'); // All the Mailgun-specific attributes, such as tags, 
 
 $message->enableTestMode(); // Don’t forget to remove this string if you really want the message to be sent
 
-echo $mailgun->sendMessage($message);
+echo $message->send();
 ```
 
 Batch sending is also supported. You can use [recipient variables](http://documentation.mailgun.com/user_manual.html#batch-sending) to customize messages.
@@ -96,7 +96,7 @@ $message->setSubject('Mailgun API library test');
 // You can use views to build your messages instead of setText() or setHtml():
 $message->renderText('myView', array('myParam' => 'Awesome!'));
 
-echo Yii::app()->mailgun->sendMessage($message);
+echo $message->send();
 ```
 All the methods of the main library class are available in the Yii component.
 
