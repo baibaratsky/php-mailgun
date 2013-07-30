@@ -27,21 +27,30 @@ class MailgunMessage implements MailgunObject
     private $_vars = array();
     private $_recipientVars = array();
 
+    protected $_api;
+
     /** @var DateTime */
     private $_deliveryTime;
 
-    public function __construct(MailgunApi $api = null)
+    public function __construct(MailgunApi $api)
     {
-        if ($api !== null) {
-            $this->_from = $api->getFrom();
-            $this->_tags = $api->getTags();
-            $this->_campaignId = $api->getCampaignId();
-            $this->_enableDkim = $api->getIsDkimEnabled();
-            $this->_enableTestMode = $api->getIsTestModeEnabled();
-            $this->_enableTracking = $api->getIsTrackingEnabled();
-            $this->_clicksTrackingMode = $api->getClicksTrackingMode();
-            $this->_enableOpensTracking = $api->getIsOpensTrackingEnabled();
-        }
+        $this->_api = $api;
+        $this->_from = $api->getFrom();
+        $this->_tags = $api->getTags();
+        $this->_campaignId = $api->getCampaignId();
+        $this->_enableDkim = $api->getIsDkimEnabled();
+        $this->_enableTestMode = $api->getIsTestModeEnabled();
+        $this->_enableTracking = $api->getIsTrackingEnabled();
+        $this->_clicksTrackingMode = $api->getClicksTrackingMode();
+        $this->_enableOpensTracking = $api->getIsOpensTrackingEnabled();
+    }
+
+    /**
+     * @return string Mailgun ID of the message
+     */
+    public function send()
+    {
+        return $this->_api->sendMessage($this);
     }
 
     /**
