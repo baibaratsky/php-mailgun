@@ -1,12 +1,13 @@
 <?php
 /** @author Andrei Baibaratsky */
 
-require_once 'MailgunMessage.php';
-require_once 'MailgunUnsubscribe.php';
-require_once 'MailgunComplaint.php';
 require_once 'MailgunBounce.php';
+require_once 'MailgunComplaint.php';
 require_once 'MailgunList.php';
 require_once 'MailgunListMember.php';
+require_once 'MailgunMessage.php';
+require_once 'MailgunRoute.php';
+require_once 'MailgunUnsubscribe.php';
 
 class MailgunApi
 {
@@ -376,6 +377,62 @@ class MailgunApi
     {
         $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/bounces/' . $userAddress);
         return $response['message'] == 'Bounced address has been removed';
+    }
+
+    /**
+     * @param int $limit    Maximum number of records to return (100 by default)
+     * @param int $skip     Records to skip (0 by default)
+     * @return MailgunRoute[]
+     */
+    public function getRoutes($limit = 100, $skip = 0)
+    {
+        $response = $this->_performRequest('GET', $this->_url . 'routes?limit=' . $limit . '&skip=' . $skip);
+        $routes = array();
+        foreach ($response['items'] as $item) {
+            $routes[$item['id']] = MailgunRoute::load($item);
+        }
+        return $routes;
+    }
+
+    /**
+     * @param string $id    Id of the route to find
+     * @return MailgunRoute
+     */
+    public function getRoute($id)
+    {
+        $response = $this->_performRequest('GET', $this->_url . 'routes/' . $id);
+        return MailgunRoute::load($response['route']);
+    }
+
+    /**
+     * @param MailgunRoute $route   Route object to create
+     * @return MailgunRoute         Created route object
+     */
+    public function createRoute(MailgunRoute $route)
+    {
+        $response = $this->_performRequest('POST', $this->_url . 'routes', $route);
+        return MailgunRoute::load($response['route']);
+    }
+
+    /**
+     * @param string $id            Address of the route to update
+     * @param MailgunRoute $route   Route object containing new data
+     * @return MailgunRoute         Updated route object
+     */
+    public function updateRoute($id, MailgunRoute $route)
+    {
+        $response = $this->_performRequest('PUT', $this->_url . 'routes/' . $id, $route);
+        return MailgunRoute::load($response);
+    }
+
+    /**
+     * @param string $id   Address of the mailing list to delete
+     * @return bool                 Whether the list has been successfully deleted
+     */
+    public function deleteRoute($id)
+    {
+        $response = $this->_performRequest('DELETE', $this->_url . 'routes/' . $id);
+        return $response['message'] == 'Route has been deleted';
     }
 
     /**

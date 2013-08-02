@@ -62,6 +62,15 @@ bool                 createBounce(MailgunBounce $bounce)
 bool                 deleteBounce(string $userAddress)
 ```
 
+Routes:
+```
+MailgunRoute[]       getRoutes(int $limit = 100, int $skip = 0)
+MailgunRoute         getRoute(string $id)
+MailgunRoute         createRoute(MailgunRoute $route)
+MailgunRoute         updateRoute(string $id, MailgunRoute $route)
+bool                 deleteRoute(string $id)
+```
+
 Webhook signature validation:
 ```php
 if (!$mailgun->validateHook($_POST)) {
