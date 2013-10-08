@@ -135,7 +135,7 @@ class MailgunMessage implements MailgunObject
     }
 
     /**
-     * @param string $address   Email address for Blind carbon copy
+     * @param string $address   Email address
      * @param string $name      Recipient name
      */
     public function addReplyTo($address, $name = null)
