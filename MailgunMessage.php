@@ -11,6 +11,7 @@ class MailgunMessage implements MailgunObject
     private $_to = array();
     private $_cc = array();
     private $_bcc = array();
+    private $_replyTo = array();
     private $_subject;
     private $_text;
     private $_html;
@@ -131,6 +132,23 @@ class MailgunMessage implements MailgunObject
     public function getBcc()
     {
         return $this->_bcc;
+    }
+
+    /**
+     * @param string $address   Email address
+     * @param string $name      Recipient name
+     */
+    public function addReplyTo($address, $name = null)
+    {
+        $this->_replyTo[] = array($address, $name);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getReplyTo()
+    {
+        return $this->_replyTo;
     }
 
     /**
@@ -447,6 +465,9 @@ class MailgunMessage implements MailgunObject
         }
         if (!empty($this->_bcc)) {
             $data['bcc'] = $this->_formatAddresses($this->_bcc);
+        }
+        if (!empty($this->_replyTo)) {
+            $data['h:Reply-To'] = $this->_formatAddresses($this->_replyTo);
         }
         if (!empty($this->_text)) {
             $data['text'] = $this->_text;
