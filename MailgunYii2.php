@@ -182,6 +182,6 @@ class MailgunMessageYii2 extends MailgunMessage
      */
     protected function render($view, $params = array())
     {
-        return Yii::$app->view->renderFile($this->viewPath . '/' . $view, $params);
+        return Yii::$app->view->render($this->viewPath . '/' . $view, $params);
     }
 }
