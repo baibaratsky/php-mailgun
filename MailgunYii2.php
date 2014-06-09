@@ -3,7 +3,7 @@
 require('MailgunApi.php');
 
 /**
- * Class MailgunYii
+ * Class MailgunYii2
  *
  * @method string               sendMessage(MailgunMessageYii $message)
  * @method MailgunList[]        getMailingLists(int $limit = 100, int $skip = 0)
@@ -119,11 +119,11 @@ class MailgunYii2 extends \yii\base\Component
     }
 
     /**
-     * @return MailgunMessageYii
+     * @return MailgunMessageYii2
      */
     public function newMessage()
     {
-        $message = new MailgunMessageYii($this->_api);
+        $message = new MailgunMessageYii2($this->_api);
         $message->setViewPath($this->viewPath);
 
         return $message;
