@@ -1,6 +1,8 @@
 <?php
 
-require('MailgunApi.php');
+/** @author Constantin Chuprik */
+
+require_once 'MailgunApi.php';
 
 /**
  * Class MailgunYii2
