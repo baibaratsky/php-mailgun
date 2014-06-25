@@ -1,14 +1,6 @@
 <?php
 /** @author Andrei Baibaratsky */
 
-require_once 'MailgunBounce.php';
-require_once 'MailgunComplaint.php';
-require_once 'MailgunList.php';
-require_once 'MailgunListMember.php';
-require_once 'MailgunMessage.php';
-require_once 'MailgunRoute.php';
-require_once 'MailgunUnsubscribe.php';
-
 class MailgunApi
 {
     protected $_curl;
