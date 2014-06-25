@@ -87,7 +87,7 @@ Yii users can use this library as an extension. Just put *php-mailgun* in your e
     'components' => array(
         ...
         'mailgun' => array(
-            'class' => 'application.extensions.php-mailgun.MailgunYii',
+            'class' => 'vendor.baibaratsky.php-mailgun.MailgunYii',
             'domain' => 'example.com',
             'key' => 'key-somekey',
             'tags' => array('yii'), // You may also specify some Mailgun parameters
