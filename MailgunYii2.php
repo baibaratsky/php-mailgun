@@ -1,8 +1,5 @@
 <?php
-
-/** @author Constantin Chuprik */
-
-require_once 'MailgunApi.php';
+/** @author Andrei Baibaratsky */
 
 /**
  * Class MailgunYii2
