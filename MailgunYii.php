@@ -1,8 +1,6 @@
 <?php
 /** @author Andrei Baibaratsky */
 
-require_once 'MailgunApi.php';
-
 /**
  * Class MailgunYii
  *
