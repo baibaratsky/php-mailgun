@@ -81,7 +81,7 @@ if (!$mailgun->validateHook($_POST)) {
 ```
 
 ###Yii extension
-Yii users can use this library as an extension. Just put *php-mailgun* in your extensions directory and add some code in the *components* section of your config file:
+Yii users can use this library as an extension. Just put *php-mailgun* in your extensions directory or use Composer, and add some code in the *components* section of your config file:
 ```php
 ...
     'components' => array(
