@@ -1,7 +1,7 @@
 {
     "name": "baibaratsky/php-mailgun",
-    "description": "Mailgun API PHP library",
-    "keywords": ["mailgun", "mail", "email", "mailing lists"],
+    "description": "Mailgun API PHP library and Yii extension",
+    "keywords": ["mailgun", "mail", "email", "mailing lists", "yii"],
     "license": "BSD-3-Clause",
     "homepage": "http://github.com/baibaratsky/php-mailgun",
     "authors": [
