@@ -1,5 +1,8 @@
 Mailgun API PHP library
 =======================
+[![Packagist](https://img.shields.io/packagist/l/baibaratsky/php-mailgun.svg)](https://github.com/baibaratsky/php-mailgun/blob/master/LICENSE.md)
+[![Packagist](https://img.shields.io/packagist/v/baibaratsky/php-mailgun.svg)](https://packagist.org/packages/baibaratsky/php-mailgun)
+[![Packagist](https://img.shields.io/packagist/dt/baibaratsky/php-mailgun.svg)](https://packagist.org/packages/baibaratsky/php-mailgun)
 
 The library requires PHP 5.2 compiled with [cURL extension](http://www.php.net/manual/en/book.curl.php).
 
