@@ -18,7 +18,7 @@ The library requires PHP 5.2 compiled with [cURL extension](http://www.php.net/m
 0. Add php-mailgun dependency:
 
     ```
-    php composer.phar require baibaratsky/php-mailgun:*
+    php composer.phar require baibaratsky/php-mailgun:1.0.*
     ```
 
 
