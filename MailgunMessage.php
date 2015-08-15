@@ -7,6 +7,8 @@ class MailgunMessage implements MailgunObject
     const CLICKS_TRACKING_ENABLED = 1;
     const CLICKS_TRACKING_HTML_ONLY = 2;
 
+    protected static $_legacyAttachMode;
+
     private $_from;
     private $_to = array();
     private $_cc = array();
@@ -35,6 +37,10 @@ class MailgunMessage implements MailgunObject
 
     public function __construct(MailgunApi $api)
     {
+        if (self::$_legacyAttachMode === null) {
+            self::$_legacyAttachMode = !class_exists('CURLFile', false);
+        }
+
         $this->_api = $api;
         $this->_from = $api->getFrom();
         $this->_tags = $api->getTags();
@@ -477,11 +483,11 @@ class MailgunMessage implements MailgunObject
         }
 
         foreach ($this->_attachments as $number => $attachment) {
-            $data['attachment[' . ($number + 1) . ']'] = '@' . $attachment;
+            $data['attachment[' . ($number + 1) . ']'] = $this->_attach($attachment);
         }
 
         foreach ($this->_inline as $number => $attachment) {
-            $data['inline[' . ($number + 1) . ']'] = '@' . $attachment;
+            $data['inline[' . ($number + 1) . ']'] = $this->_attach($attachment);
         }
 
         foreach ($this->_tags as $number => $tag) {
@@ -569,5 +575,10 @@ class MailgunMessage implements MailgunObject
             $formattedAddresses[] = $this->_formatAddress($address);
         }
         return implode(', ', $formattedAddresses);
+    }
+
+    private function _attach($attachment)
+    {
+        return self::$_legacyAttachMode ? '@' . $attachment : new CURLFile($attachment);
     }
 }
