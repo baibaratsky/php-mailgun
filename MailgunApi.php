@@ -4,7 +4,7 @@
 class MailgunApi
 {
     protected $_curl;
-    protected $_url = 'https://api.mailgun.net/v2/';
+    protected $_url = 'https://api.mailgun.net/v3/';
     protected $_timeout = 10;
 
     private $_from;
