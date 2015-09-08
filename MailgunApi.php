@@ -16,6 +16,8 @@ class MailgunApi
     private $_clicksTrackingMode;
     private $_enableOpensTracking;
 
+    private $_enableDryRun = false;
+
     private $_domain;
     private $_key;
 
@@ -50,6 +52,10 @@ class MailgunApi
      */
     public function sendMessage(MailgunMessage $message)
     {
+        if ($this->_enableDryRun) {
+            return '';
+        }
+
         $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/messages', $message);
         return $response['id'];
     }
@@ -107,7 +113,7 @@ class MailgunApi
     public function deleteMailingList($listAddress)
     {
         $response = $this->_performRequest('DELETE', $this->_url . 'lists/' . $listAddress);
-        return $response['message'] == 'Mailing list has been deleted';
+        return $response['message'] === 'Mailing list has been deleted';
     }
 
     /**
@@ -161,7 +167,7 @@ class MailgunApi
      */
     public function addMultipleMembersToMailingList($listAddress, $members)
     {
-        if (count($members) == 0) {
+        if (count($members) === 0) {
             throw new MailgunException('The members list is empty.');
         }
 
@@ -206,7 +212,7 @@ class MailgunApi
     {
         $response = $this->_performRequest('DELETE', $this->_url . 'lists/' . $listAddress
                                                                  . '/members/' . $memberAddress);
-        return $response['message'] == 'Mailing list member has been deleted';
+        return $response['message'] === 'Mailing list member has been deleted';
     }
 
     /**
@@ -256,7 +262,7 @@ class MailgunApi
     public function createUnsubscribe(MailgunUnsubscribe $unsubscribe)
     {
         $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/unsubscribes', $unsubscribe);
-        return $response['message'] == 'Address has been added to the unsubscribes table';
+        return $response['message'] === 'Address has been added to the unsubscribes table';
     }
 
     /**
@@ -266,7 +272,7 @@ class MailgunApi
     public function deleteUnsubscribe($id)
     {
         $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/unsubscribes/' . $id);
-        return $response['message'] == 'Unsubscribe event has been removed';
+        return $response['message'] === 'Unsubscribe event has been removed';
     }
 
     /**
@@ -276,7 +282,7 @@ class MailgunApi
     public function deleteUserUnsubscribes($userAddress)
     {
         $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/unsubscribes/' . $userAddress);
-        return $response['message'] == 'Unsubscribe event has been removed';
+        return $response['message'] === 'Unsubscribe event has been removed';
     }
 
     /**
@@ -312,7 +318,7 @@ class MailgunApi
     public function createComplaint(MailgunComplaint $complaint)
     {
         $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/complaints', $complaint);
-        return $response['message'] == 'Address has been added to the complaints table';
+        return $response['message'] === 'Address has been added to the complaints table';
     }
 
     /**
@@ -322,7 +328,7 @@ class MailgunApi
     public function deleteComplaint($userAddress)
     {
         $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/complaints/' . $userAddress);
-        return $response['message'] == 'Spam complaint has been removed';
+        return $response['message'] === 'Spam complaint has been removed';
     }
 
     /**
@@ -358,7 +364,7 @@ class MailgunApi
     public function createBounce(MailgunBounce $bounce)
     {
         $response = $this->_performRequest('POST', $this->_url . $this->_domain . '/bounces', $bounce);
-        return $response['message'] == 'Address has been added to the bounces table';
+        return $response['message'] === 'Address has been added to the bounces table';
     }
 
     /**
@@ -368,7 +374,7 @@ class MailgunApi
     public function deleteBounce($userAddress)
     {
         $response = $this->_performRequest('DELETE', $this->_url . $this->_domain . '/bounces/' . $userAddress);
-        return $response['message'] == 'Bounced address has been removed';
+        return $response['message'] === 'Bounced address has been removed';
     }
 
     /**
@@ -424,7 +430,7 @@ class MailgunApi
     public function deleteRoute($id)
     {
         $response = $this->_performRequest('DELETE', $this->_url . 'routes/' . $id);
-        return $response['message'] == 'Route has been deleted';
+        return $response['message'] === 'Route has been deleted';
     }
 
     /**
@@ -588,6 +594,28 @@ class MailgunApi
     }
 
     /**
+     * You can use dry run to test your code without making real API requests
+     * Affects only sendMessage()!
+     */
+    public function enableDryRun()
+    {
+        $this->_enableDryRun = true;
+    }
+
+    public function disableDryRun()
+    {
+        $this->_enableDryRun = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsDryRunEnabled()
+    {
+        return $this->_enableDryRun;
+    }
+
+    /**
      * @return resource cURL instance
      */
     protected function _getCurl()
@@ -636,7 +664,7 @@ class MailgunApi
             throw new MailgunException('Mailgun server error', $responseStatus);
         } else {
             $responseArray = json_decode($response, true);
-            if ($responseStatus == 200) {
+            if ($responseStatus === 200) {
                 return $responseArray;
             } else {
                 throw new MailgunException(!empty($responseArray['message']) ? $responseArray['message'] : $response,

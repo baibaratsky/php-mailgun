@@ -18,7 +18,7 @@ The library requires PHP 5.2 compiled with [cURL extension](http://www.php.net/m
 0. Add php-mailgun dependency:
 
     ```
-    php composer.phar require baibaratsky/php-mailgun:1.1.*
+    php composer.phar require baibaratsky/php-mailgun:1.2.*
     ```
 
 
@@ -38,6 +38,9 @@ $message->setText('Amazing! It’s working!');
 $message->addTag('test'); // All the Mailgun-specific attributes, such as tags, vars, tracking, etc. are supported
 
 $message->enableTestMode(); // Don’t forget to remove this string if you really want the message to be sent
+
+// You can also use dry run to test your code without making real API requests (only for sendMessage())
+// $mailgun->enableDryRun();
 
 echo $message->send();
 ```

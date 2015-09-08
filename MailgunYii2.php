@@ -76,6 +76,8 @@ class MailgunYii2 extends \yii\base\Component
     public $clicksTrackingMode;
     public $enableOpensTracking;
 
+    public $enableDryRun;
+
     protected $_api;
 
     public function __call($name, $parameters)
@@ -114,6 +116,9 @@ class MailgunYii2 extends \yii\base\Component
         }
         if (isset($this->enableOpensTracking)) {
             $this->enableOpensTracking ? $this->_api->enableOpensTracking() : $this->_api->disableOpensTracking();
+        }
+        if (isset($this->enableDryRun)) {
+            $this->enableDryRun ? $this->_api->enableDryRun() : $this->_api->disableDryRun();
         }
     }
 

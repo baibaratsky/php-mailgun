@@ -159,7 +159,7 @@ class MailgunRoute implements MailgunObject
     public function removeAction($action)
     {
         foreach ($this->_actions as $key => $value) {
-            if ($value == $action) {
+            if ($value === $action) {
                 unset($this->_actions[$key]);
             }
         }
